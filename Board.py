@@ -54,18 +54,20 @@ class Board:
     def printer(self):
         self.refresh_terminal()
         self.set()
+        print('\033[?25l')
         self.slow_print(self.board)
         if(self.result == self.State.Draw):
-            self.ann_hol[1] = "IT IS A DRAW."
+            self.ann_hol[1] = "  IT IS A DRAW"
             self.announcer()
         elif(self.result == self.State.AI):
             self.ann_hol[0] = self.red
-            self.ann_hol[1] = "ALAS! YOU LOST."
+            self.ann_hol[1] = "ALAS! YOU LOST"
             self.announcer()
         elif(self.result == self.State.User):
             self.ann_hol[0] = self.blue
-            self.ann_hol[1] = "HURRAY! YOU WIN."
+            self.ann_hol[1] = "HURRAY! YOU WIN"
             self.announcer()
+        print('\033[?25h')
 
 
     def reset_board(self):
