@@ -9,6 +9,8 @@ class Board:
     def __init__(self, user_sign: str):
         self.margin = "        "
         self.result = self.State.Pending
+        self.win_row = {}
+        self.dim = "\033[2m"
         self.glo = "\033[0m"
         self.red = "\033[91m"
         self.blue = "\033[94m"
@@ -21,7 +23,7 @@ class Board:
     def coordinates(pos: int)->tuple:
         return (pos // 3, pos % 3)
 
-    def set(self):
+    def set_board(self):
         self.board = (
             f"{self.margin}  {self.hlit[0][0]}{self.cell[0][0]}{self.glo}  |  {self.hlit[0][1]}{self.cell[0][1]}{self.glo}  |  {self.hlit[0][2]}{self.cell[0][2]}{self.glo}  \n"
             f"{self.margin}-----------------\n"
@@ -51,11 +53,24 @@ class Board:
         sys.stdout.write('\033[3E')
         print()
 
-    def printer(self):
+    def highlighter(self):
+        self.reset_highlighter()
+        highlit = self.blue if self.result == self.State.User else self.red
+        for pos in self.win_row:
+            self.hlit[pos[0]][pos[1]] = "\033[1m"+highlit
+        for pos in self.available_moves:
+            self.cell[pos[0]][pos[1]] = " "
+
+    def printer(self, rapid = False):
         self.refresh_terminal()
-        self.set()
+        if(self.result != self.State.Pending):
+            self.highlighter()
+        self.set_board()
         print('\033[?25l')
-        self.slow_print(self.board)
+        if rapid:
+            print(self.board)
+        else:
+            self.slow_print(self.board)
         if(self.result == self.State.Draw):
             self.ann_hol[1] = "OH! IT'S A DRAW"
             self.announcer()
@@ -69,19 +84,24 @@ class Board:
             self.announcer()
         print('\033[?25h')
 
+    def reset_highlighter(self):
+        self.hlit = [[self.dim,self.dim,self.dim],
+                    [self.dim,self.dim,self.dim],
+                    [self.dim,self.dim,self.dim]]
 
     def reset_board(self):
         self.refresh_terminal()
         self.result = self.State.Pending
+        self.win_row = {}
         self.ann_hol = ["",""]
         self.cell = [["0", "1", "2"], 
                     ["3", "4", "5"], 
                     ["6", "7", "8"]]
-        self.hlit = [["\033[38;2;100;100;100m","\033[38;2;100;100;100m","\033[38;2;100;100;100m"],
-                    ["\033[38;2;100;100;100m","\033[38;2;100;100;100m","\033[38;2;100;100;100m"],
-                    ["\033[38;2;100;100;100m","\033[38;2;100;100;100m","\033[38;2;100;100;100m"]]
+        self.hlit = [[self.dim,self.dim,self.dim],
+                    [self.dim,self.dim,self.dim],
+                    [self.dim,self.dim,self.dim]]
         self.available_moves = {(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2)}
-        self.set()
+        self.set_board()
         self.printer()
 
 
@@ -98,9 +118,11 @@ class Board:
         (i, j) = pos
         self.cell[i][j] = self.aisign
         self.available_moves.remove((i , j))
-        self.referee()
+        self.win_row = self.referee()
         self.hlit[i][j] = "\033[1m"+self.red
-        self.printer()
+        self.printer(rapid=True)
+
+        print("AI chooses: ", i*3+j)
 
     def user_mover(self, pos: tuple):
         if self.result != self.State.Pending:
@@ -108,29 +130,39 @@ class Board:
         (i, j) = pos
         self.cell[i][j] = self.usersign
         self.available_moves.remove((i , j))
-        self.referee()
+        self.win_row = self.referee()
         self.hlit[i][j] = "\033[1m"+self.blue
         self.printer()
 
-    def referee(self):
+    def referee(self) -> set[tuple]:
         if self.cell[0][0] == self.cell[0][1] == self.cell[0][2]:
-            self.result = (self.State.AI if self.cell[0][0] == self.aisign else self.State.User) 
-        elif self.cell[0][0] == self.cell[1][1] == self.cell[2][2]: #
-            self.result = (self.State.AI if self.cell[0][0] == self.aisign else self.State.User) 
-        elif self.cell[0][0] == self.cell[1][0] == self.cell[2][0]: #
             self.result = (self.State.AI if self.cell[0][0] == self.aisign else self.State.User)
-        elif self.cell[1][0] == self.cell[1][1] == self.cell[1][2]: #
+            return {(0,0), (0,1), (0,2)} 
+        elif self.cell[0][0] == self.cell[1][1] == self.cell[2][2]:
+            self.result = (self.State.AI if self.cell[0][0] == self.aisign else self.State.User)
+            return {(0,0), (1,1), (2,2)} 
+        elif self.cell[0][0] == self.cell[1][0] == self.cell[2][0]: 
+            self.result = (self.State.AI if self.cell[0][0] == self.aisign else self.State.User)
+            return {(0,0), (1,0), (2,0)} 
+        elif self.cell[1][0] == self.cell[1][1] == self.cell[1][2]:
             self.result = (self.State.AI if self.cell[1][0] == self.aisign else self.State.User)
-        elif self.cell[2][0] == self.cell[2][1] == self.cell[2][2]: #
+            return {(1,0), (1,1), (1,2)} 
+        elif self.cell[2][0] == self.cell[2][1] == self.cell[2][2]: 
             self.result = (self.State.AI if self.cell[2][0] == self.aisign else self.State.User) 
-        elif self.cell[0][1] == self.cell[1][1] == self.cell[2][1]: #
+            return {(2,0), (2,1), (2,2)} 
+        elif self.cell[0][1] == self.cell[1][1] == self.cell[2][1]:
             self.result = (self.State.AI if self.cell[0][1] == self.aisign else self.State.User) 
-        elif self.cell[0][2] == self.cell[1][2] == self.cell[2][2]: #
+            return {(0,1), (1,1), (2,1)} 
+        elif self.cell[0][2] == self.cell[1][2] == self.cell[2][2]:
             self.result = (self.State.AI if self.cell[0][2] == self.aisign else self.State.User)
+            return {(0,2), (1,2), (2,2)} 
         elif self.cell[0][2] == self.cell[1][1] == self.cell[2][0]:
             self.result = (self.State.AI if self.cell[0][2] == self.aisign else self.State.User) 
+            return {(0,2), (1,1), (2,0)} 
         else:
             self.result = (self.State.Draw if len(self.available_moves) == 0 else self.State.Pending)
+            return {} 
+
 
     def undo_move(self, pos: tuple):
         self.available_moves.add(pos)
