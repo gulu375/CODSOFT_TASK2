@@ -7,7 +7,7 @@ import time
 
 class Board:
     def __init__(self, user_sign: str):
-        self.margin = "       "
+        self.margin = "        "
         self.result = self.State.Pending
         self.glo = "\033[0m"
         self.red = "\033[91m"
@@ -38,9 +38,9 @@ class Board:
         print() 
 
     def announcer(self):
-        announce = (f"{self.ann_hol[0]}---------------------------------\n"
-                    f"        {self.ann_hol[1]}        "
-                    f"\n---------------------------------{self.glo}\n")
+        announce = (f"{self.ann_hol[0]}       -------------------\n"
+                    f"         {self.ann_hol[1]}"
+                    f"\n       -------------------{self.glo}\n")
         glow_sequence = ["\033[2;37m","\033[0;37m", "\033[1;37m", "\033[0;37m"]
         for _ in range(5):
             for style in glow_sequence:
@@ -57,11 +57,11 @@ class Board:
         print('\033[?25l')
         self.slow_print(self.board)
         if(self.result == self.State.Draw):
-            self.ann_hol[1] = "  IT IS A DRAW"
+            self.ann_hol[1] = "OH! IT'S A DRAW"
             self.announcer()
         elif(self.result == self.State.AI):
             self.ann_hol[0] = self.red
-            self.ann_hol[1] = "ALAS! YOU LOST"
+            self.ann_hol[1] = "ALAS!! YOU LOST"
             self.announcer()
         elif(self.result == self.State.User):
             self.ann_hol[0] = self.blue
@@ -99,7 +99,7 @@ class Board:
         self.cell[i][j] = self.aisign
         self.available_moves.remove((i , j))
         self.referee()
-        self.hlit[i][j] = "\033[91m"
+        self.hlit[i][j] = "\033[1m"+self.red
         self.printer()
 
     def user_mover(self, pos: tuple):
@@ -109,7 +109,7 @@ class Board:
         self.cell[i][j] = self.usersign
         self.available_moves.remove((i , j))
         self.referee()
-        self.hlit[i][j] = "\033[94m"
+        self.hlit[i][j] = "\033[1m"+self.blue
         self.printer()
 
     def referee(self):
@@ -144,9 +144,9 @@ class Board:
             subprocess.run(["cls"], shell=True)
         else:
             print("\033[H\033[2J", end="")
-        print("=================================")
-        print("      CROSSES & NOUGHTS 3000     ")
-        print("=================================")
+        print("==================================")
+        print("\033[1m----- CROSSES & NOUGHTS 3000 -----\033[0m")
+        print("==================================")
 
     class State(Enum):
         AI = 0
