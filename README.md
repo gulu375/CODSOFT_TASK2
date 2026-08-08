@@ -16,7 +16,7 @@ An implementation of the classic Tic-Tac-Toe game in Python featuring an unbeata
 ```text
 .
 ├── Board.py      # Board representation and game logic
-├── Ai.py         # Minimax implementation
+├── AI_Mover.py         # Minimax implementation
 ├── main.py       # Game loop
 └── README.md
 ```
