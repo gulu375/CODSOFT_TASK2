@@ -6,14 +6,16 @@ import time
 
 class Board:
     def __init__(self, user_sign: str):
-        self.margin = "        "
         self.result = self.State.Pending
         self.win_row = {}
+        self.margin = "        " 
         self.dim = "\033[2m"
-        self.glo = "\033[0m"
+        self.norm = "\033[0m"
         self.red = "\033[91m"
         self.blue = "\033[94m"
+        self.bold = "\033[1m"
         self.usersign = user_sign
+        self.honeydew = "\033[38;5;150m"
         self.aisign = chr(79 + 88 - ord(user_sign))
         self.refresh_terminal()
         self.reset_board()
@@ -24,11 +26,11 @@ class Board:
 
     def set_board(self):
         self.board = (
-            f"{self.margin}  {self.hlit[0][0]}{self.cell[0][0]}{self.glo}  |  {self.hlit[0][1]}{self.cell[0][1]}{self.glo}  |  {self.hlit[0][2]}{self.cell[0][2]}{self.glo}  \n"
+            f"{self.margin}  {self.hlit[0][0]}{self.cell[0][0]}{self.norm}  |  {self.hlit[0][1]}{self.cell[0][1]}{self.norm}  |  {self.hlit[0][2]}{self.cell[0][2]}{self.norm}  \n"
             f"{self.margin}-----------------\n"
-            f"{self.margin}  {self.hlit[1][0]}{self.cell[1][0]}{self.glo}  |  {self.hlit[1][1]}{self.cell[1][1]}{self.glo}  |  {self.hlit[1][2]}{self.cell[1][2]}{self.glo}  \n"
+            f"{self.margin}  {self.hlit[1][0]}{self.cell[1][0]}{self.norm}  |  {self.hlit[1][1]}{self.cell[1][1]}{self.norm}  |  {self.hlit[1][2]}{self.cell[1][2]}{self.norm}  \n"
             f"{self.margin}-----------------\n"
-            f"{self.margin}  {self.hlit[2][0]}{self.cell[2][0]}{self.glo}  |  {self.hlit[2][1]}{self.cell[2][1]}{self.glo}  |  {self.hlit[2][2]}{self.cell[2][2]}{self.glo}  \n"
+            f"{self.margin}  {self.hlit[2][0]}{self.cell[2][0]}{self.norm}  |  {self.hlit[2][1]}{self.cell[2][1]}{self.norm}  |  {self.hlit[2][2]}{self.cell[2][2]}{self.norm}  \n"
         )
 
     def slow_print(self, text, delay=0.0013):
@@ -41,10 +43,10 @@ class Board:
     def announcer(self):
         announce = (f"{self.ann_hol[0]}       -------------------\n"
                     f"         {self.ann_hol[1]}"
-                    f"\n       -------------------{self.glo}\n")
-        glow_sequence = ["\033[2;37m","\033[0;37m", "\033[1;37m", "\033[0;37m"]
+                    f"\n       -------------------{self.norm}\n")
+        normw_sequence = ["\033[2;37m","\033[0;37m", "\033[1;37m", "\033[0;37m"]
         for _ in range(5):
-            for style in glow_sequence:
+            for style in normw_sequence:
                 sys.stdout.write(f"\r{style}{announce}\033[0m")
                 sys.stdout.flush()
                 time.sleep(0.15) 
@@ -56,20 +58,23 @@ class Board:
         self.reset_highlighter()
         highlit = self.blue if self.result == self.State.User else self.red
         for pos in self.win_row:
-            self.hlit[pos[0]][pos[1]] = "\033[1m"+highlit
+            self.hlit[pos[0]][pos[1]] = self.bold+highlit
         for pos in self.available_moves:
             self.cell[pos[0]][pos[1]] = " "
 
-    def printer(self, rapid = False):
+    def printer(self, rapid = False, pos = ()):
         self.refresh_terminal()
         if(self.result != self.State.Pending):
             self.highlighter()
         self.set_board()
         print('\033[?25l')
         if rapid:
-            print(self.board)
+            print(self.board,end="\n\n")
+            print(self.red, self.bold,"       ","AI chooses:",self.norm,"\b\b",pos[0]*3+pos[1], end="\n")
+            print("        -----------------",end='')
         else:
             self.slow_print(self.board)
+            print("\n\n")
         if(self.result == self.State.Draw):
             self.ann_hol[1] = "OH! IT'S A DRAW"
             self.announcer()
@@ -119,10 +124,8 @@ class Board:
         self.cell[i][j] = self.aisign
         self.available_moves.remove((i , j))
         self.win_row = self.referee()
-        self.hlit[i][j] = "\033[1m"+self.red
-        self.printer(rapid=True)
-
-        print("AI chooses: ", i*3+j)
+        self.hlit[i][j] = self.bold+self.red
+        self.printer(rapid=True, pos=pos)
 
     def user_mover(self, pos: tuple):
         if self.result != self.State.Pending:
@@ -131,7 +134,7 @@ class Board:
         self.cell[i][j] = self.usersign
         self.available_moves.remove((i , j))
         self.win_row = self.referee()
-        self.hlit[i][j] = "\033[1m"+self.blue
+        self.hlit[i][j] = self.bold+self.blue
         self.printer()
 
     def referee(self) -> set[tuple]:
@@ -178,7 +181,7 @@ class Board:
         else:
             print("\033[H\033[2J", end="")
         print("==================================")
-        print("\033[1m----- CROSSES & NOUGHTS 3000 -----\033[0m")
+        print(f"\033[1m----- {self.honeydew}CROSSES & NOUGHTS 3000{self.norm} -----\033[0m")
         print("==================================")
 
     class State(Enum):
