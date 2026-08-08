@@ -4,7 +4,6 @@ from enum import Enum
 import sys
 import time
 
-
 class Board:
     def __init__(self, user_sign: str):
         self.margin = "        "

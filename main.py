@@ -1,7 +1,7 @@
 from Board import Board
 from AI_Mover import Minimax
 
-board = Board('X')
+board = Board(input("\nX goes first. Choose your sign among(X and O): "))
 ai = Minimax()
 while(board.result == board.State.Pending):
     cell = int(input("Give position(User): "))
