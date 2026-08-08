@@ -109,8 +109,9 @@ class Board:
         if self.result != self.State.Pending:
             return
         (i, j) = pos
-        self.cell[i][j] = "\033[1m"+sign
+        self.cell[i][j] = sign
         self.available_moves.remove((i , j))
+        self.referee()
 
     def ai_mover(self, pos: tuple):
         if self.result != self.State.Pending:
@@ -167,6 +168,7 @@ class Board:
     def undo_move(self, pos: tuple):
         self.available_moves.add(pos)
         self.cell[pos[0]][pos[1]] = str(pos[0]*3+pos[1])
+        self.result = self.State.Pending
 
     def is_valid_move(self, pos: tuple) -> bool:
         return pos in self.available_moves
