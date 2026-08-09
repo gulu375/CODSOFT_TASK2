@@ -5,7 +5,7 @@ An implementation of the classic Tic-Tac-Toe game in Python featuring an unbeata
 ## Features
 
 * Human vs AI gameplay
-* Unbeatable AI using the Minimax algorithm
+* Unbeatable AI using the Minimax with Alpha-Beta Pruning
 * Terminal-based interface
 * Move validation
 * Win, loss, and draw detection
@@ -23,7 +23,7 @@ An implementation of the classic Tic-Tac-Toe game in Python featuring an unbeata
 
 ## Requirements
 
-* Python 3.10+
+* Python 3.14+
 
 No third-party libraries are required.
 

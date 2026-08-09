@@ -13,7 +13,7 @@ class Board:
             * Resets the board.
         '''
         self.margin = "        "                        # used for indentation on the left of the board to maintain symmetry
-        self.dim = "\033[2m"                            # used to dim text in teminal
+        self.dim = "\033[2m"                            # used to dim text in terminal
         self.norm = "\033[0m"                           # used to reset the text fromat in terminal
         self.red = "\033[91m"                           # used to red the text in terminal
         self.blue = "\033[94m"                          # used to blue the text in terminal
@@ -38,7 +38,7 @@ class Board:
         Set signs to user and AI.
         X goes first in the game.
         """
-        self.usersign = user_sign                       # stores the sign(X or O) choosen by user
+        self.usersign = user_sign                       # stores the sign(X or O) chosen by user
         self.aisign = chr(79 + 88 - ord(self.usersign)) # stores other sign to the ai
 
         
@@ -89,12 +89,12 @@ class Board:
 
     def highlighter(self):
         '''
-        Highlights the winning row/col/dialgonal and dim all the others.
+        Highlights the winning row/col/diagonal and dim all the others.
         '''
         self.reset_highlighter()                                            # dims every cell
         highlit = self.blue if self.result == self.State.User else self.red
         for pos in self.win_row:
-            self.hlit[pos[0]][pos[1]] = self.bold+highlit                   # highlights only the winning row/col/dialgonal
+            self.hlit[pos[0]][pos[1]] = self.bold+highlit                   # highlights only the winning row/col/diagonal
         for pos in self.available_moves:
             self.cell[pos[0]][pos[1]] = " "                                 # blancks the every unused cells
 
@@ -104,19 +104,19 @@ class Board:
         Calls the announcer if the game is over.
 
         Parameters:
-            rapid (bool) : Checks if annimation will be applied. By default, false.
-            pos (tuple) :  Passes positition of the last move. Generally used by AI mover.
+            rapid (bool) : Checks if animation will be applied. By default, false.
+            pos (tuple) :  Passes position of the last move. Generally used by AI mover.
         '''
         self.refresh_terminal()                     # refreshes the terminal to erase the old board.
         if(self.result != self.State.Pending):
             self.highlighter()                      # calls the highlighter if the game is over.
-        self.update_board()                         # updates the board before displying
+        self.update_board()                         # updates the board before displaying
         print('\033[?25l')
-        if rapid:                                   # if the move was of AI, it skips the annimation and print instantly
+        if rapid:                                   # if the move was of AI, it skips the animation and print instantly
             print(self.board,end="\n\n")
             print(self.red, self.bold,"       ","AI chooses:",self.norm,"\b\b",pos[0]*3+pos[1], end="\n")
             print("        -----------------",end='')
-        else:                                       # if the move was of User, it prints the board with annimation
+        else:                                       # if the move was of User, it prints the board with animation
             self.slow_print(self.board)
             print("\n\n")                                            
         if(self.result == self.State.Draw):                 #
@@ -136,7 +136,7 @@ class Board:
     def reset_highlighter(self):
         '''
         Dims every cell of the board.
-        Generally used before highlighting the winning row/col/dialgonal.
+        Generally used before highlighting the winning row/col/diagonal.
         '''
         self.hlit = [[self.dim,self.dim,self.dim],
                     [self.dim,self.dim,self.dim],
@@ -147,7 +147,7 @@ class Board:
         Resets or sets the game to a new beginning.
         '''
         self.result = self.State.Pending                # keeps result of the game after every move
-        self.win_row = {}                               # stores the winning row/col/dialgonal 
+        self.win_row = {}                               # stores the winning row/col/diagonal 
         self.announcement_color = ""                    # stores the announcement color
         self.announcement_text = ""                     # stores the announcement text
         self.cell = [["0", "1", "2"],                   # stores the cell number to display the user
@@ -166,7 +166,7 @@ class Board:
         Al uses this to temporarily make a move. 
 
         Parameters:
-            pos (tuple) : Passes the choosen cell position by AI
+            pos (tuple) : Passes the chosen cell position by AI
             sign (str) : Passes the alloted sign to the AI
         '''
         if self.result != self.State.Pending:           # checks if the the game is not over
@@ -180,7 +180,7 @@ class Board:
         Ai uses this to execute it's confirmed move.
 
         Parameters:
-            pos (tuple) : Passes the cell position choosen by the AI
+            pos (tuple) : Passes the cell position chosen by the AI
         '''
         if self.result != self.State.Pending:           # checks if the the game is not over
             return
@@ -192,10 +192,10 @@ class Board:
 
     def user_mover(self, pos: tuple):
         '''
-        Impliments the move choosen by the user.
+        Implements the move chosen by the user.
 
         Parameters:
-            pos (tuple) : Passes the cell position choosen by the user.
+            pos (tuple) : Passes the cell position chosen by the user.
         '''
         if self.result != self.State.Pending:           # checks if the the game is not over
             return
@@ -208,10 +208,10 @@ class Board:
     def referee(self) -> set[tuple]:
         '''
         * Checks if the game comes to a result.
-        * Stores the result to the result valriable.
-        * Returns the winning row/col/dialgonal.
+        * Stores the result to the result variable.
+        * Returns the winning row/col/diagonal.
         Returns:
-            set[tuple] : The winning row/col/dialgonal.
+            set[tuple] : The winning row/col/diagonal.
         '''
         if self.cell[0][0] == self.cell[0][1] == self.cell[0][2]:
             self.result = (self.State.AI if self.cell[0][0] == self.aisign else self.State.User)

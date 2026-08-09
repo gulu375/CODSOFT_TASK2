@@ -1,7 +1,7 @@
 [project]
 name = "codsoft-task2"
 version = "0.1.0"
-description = "Add your description here"
+description = "A terminal-based Tic-Tac-Toe game featuring an unbeatable AI using Minimax with Alpha-Beta pruning"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = []

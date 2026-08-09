@@ -9,7 +9,7 @@ class Minimax:
 
         Parameters:
             board (Board) : Passes the board object.
-            maximizing (bool) : Passes the purpose. Either maximize or minimaize the score.
+            maximizing (bool) : Passes the purpose. Either maximize or minimize the score.
             alpha (float) : Passes the best score the maximizing player can guarantee so far
             beta (float) : Passes the best score the minimizing player can guarantee so far
         
@@ -25,7 +25,7 @@ class Minimax:
                 return 0                                                    # returns 0 is its a draw
             case Board.State.Pending:
                 if maximizing:                                              # checks if have maximize the score
-                    best = float("-inf")                                    # initally keeps best score to negetive infinity            
+                    best = float("-inf")                                    # initially keeps best score to negative infinity            
                     for pos in board.available_moves:                       # iterates for every available moves
                         board.tester_mover(pos, board.aisign)               # temporarily plays the move
                         score = self.minimax(board, False, alpha, beta)     # explores further possibilities after the move and gets best possible score
@@ -36,7 +36,7 @@ class Minimax:
                             break
                     return best                                             # returns the best score
                 else:                                                       # checks if have minimize the score
-                    best = float("inf")                                     # initally keeps best score to positive infinity
+                    best = float("inf")                                     # initially keeps best score to positive infinity
                     for pos in board.available_moves:                       # iterates for every available moves
                         board.tester_mover(pos, board.usersign)             # temporarily plays the move
                         score = self.minimax(board, True, alpha, beta)      # explores further possibilities after the move and gets best possible score
@@ -59,7 +59,7 @@ class Minimax:
         Returns:
             tuple : Returns the best possible move in current state
         '''
-        best = float("-inf")                                                # initally keeps best score to negetive infinity  
+        best = float("-inf")                                                # initially keeps best score to negative infinity  
         move = None                                                         # keeps the move to none
 
         for pos in board.available_moves:                                   # iterates for every available moves
